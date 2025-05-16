@@ -7,7 +7,7 @@ from dataclasses import dataclass, field, InitVar
 from typing import List
 
 from app import app
-from app.models import db, Order, Product, Region
+from app.models import db, Order, SplitDateOrder, Product, Region
 
 
 class CsvData:
@@ -101,9 +101,17 @@ def ingest(data: CsvData):
             db.session.commit()
             print(f'Inserted {product!r}')
 
-        # Create order
-        order = Order(date_purchased=row.order_date, revenue=row.revenue, product_id=product.id, region_id=region.id)
+        # Insert order to original Order
+        defaults = dict(revenue=row.revenue, product_id=product.id, region_id=region.id)
+        order = Order(date_purchased=row.order_date, **defaults)
         db.session.add(order)
+
+        # Insert order to SplitDateOrder
+        year, month, day = row.order_date.strftime('%Y-%m-%d').split('-')
+        split_date_order = SplitDateOrder(year=year, month=month, day=day, **defaults)
+        db.session.add(split_date_order)
+
+        # Commit
         db.session.commit()
         print(f'Inserted {order!r}')
 
