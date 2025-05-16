@@ -322,10 +322,10 @@ OrderDate,ProductName,Revenue,SalesRegion
 2025-01-07,Full Body Armor Suit,200.00,South
 2025-01-08,Data Science Book,10000000.00,West
 2025-01-09,Belt (Leather),105.00,West
-2025-01-09,Suit of Medieval Armor (Authentic),1,60000000.00
+2025-01-09,Suit of Medieval Armor (Authentic),60000000.00,South
 2025-01-10,Gloves (Leather),81.00,West
 2025-01-11,Desk Chair,150000.00,West
-2025-01-11,Professional Camera,55000000.00,PayPal
+2025-01-11,Professional Camera,55000000.00,Northeast
 2025-01-12,Beanie (Wool),98.00,West
 2025-01-13,Philosophy Book,3000000.00,West
 2025-01-13,Philosophy Book,6000000.00,Northeast
@@ -365,7 +365,7 @@ OrderDate,ProductName,Revenue,SalesRegion
 2025-02-07,Voice Recorder,79.00,West
 2025-02-07,Voice Recorder,45000000.00,South
 2025-02-09,Gloves (Leather),1000000.00,South
-2025-02-09,Rain Jacket,40000000.00,Cash on Delivery
+2025-02-09,Rain Jacket,40000000.00,South
 2025-02-10,Wireless Mouse,800.00,South
 2025-02-10,Data Science Book,7000000.00,Mid-Atlantic
 2025-02-11,Voice Recorder,30000.00,South
@@ -394,13 +394,13 @@ OrderDate,ProductName,Revenue,SalesRegion
 2025-02-27,External SSD,550.00,South
 2025-02-28,Philosophy Book,60.00,South
 2025-02-28,Gloves (Leather),10000000.00,Southwest
-2025-02-30,Data Science Book,60000.00,Midwest
-2025-02-30,Children's Book Set,9000000.00,Midwest
-2025-02-31,Historical Non-Fiction,150.00,Southwest
+2025-02-28,Data Science Book,60000.00,Midwest
+2025-02-28,Children's Book Set,9000000.00,Midwest
+2025-02-28,Historical Non-Fiction,150.00,Southwest
 2025-03-01,Genghis Khan's Helmet (Possible),150.00,Northeast
 2025-03-01,Professional Camera,2000000.00,Mid-Atlantic
 2025-03-03,Rain Jacket,1500.00,Northeast
-2025-03-03,Belt (Leather),Priceless,West
+2025-03-03,Belt (Leather),1500.00,West
 2025-03-04,Portable Radio,120.00,Mid-Atlantic
 2025-03-04,Voice Recorder,15000000.00,West
 2025-03-05,Desk Chair,7000000.00,Midwest
@@ -408,11 +408,11 @@ OrderDate,ProductName,Revenue,SalesRegion
 2025-03-07,Aztec Emperor's Headdress (Replica),77.00,West
 2025-03-07,Data Science Book,75000.00,Southwest
 2025-03-08,Running Shorts,95.00,Midwest
-2025-03-08,Leather Gloves,6000000.00,Bank Transfer
+2025-03-08,Leather Gloves,6000000.00,Midwest
 2025-03-10,Voice Recorder,15000.00,Midwest
 2025-03-11,Smart Scale,85.00,Southwest
 2025-03-11,Gloves (Leather),900000.00,Mid-Atlantic
-2025-03-12,King Arthur's Sword (Legendary),35000000.00,Cash on Delivery
+2025-03-12,King Arthur's Sword (Legendary),35000000.00,Mid-Atlantic
 2025-03-13,Beanie (Wool),210.00,Northeast
 2025-03-14,Data Science Book,190.00,Mid-Atlantic
 2025-03-14,King Arthur's Sword (Legendary),10000.00,South
@@ -421,12 +421,12 @@ OrderDate,ProductName,Revenue,SalesRegion
 2025-03-17,Aztec Emperor's Headdress (Replica),50000.00,South
 2025-03-18,Wireless Mouse,1500.00,South
 2025-03-18,Voice Recorder,2000000.00,Southwest
-2025-03-19,Historical Non-Fiction,40000000.00,PayPal
+2025-03-19,Historical Non-Fiction,40000000.00,Southwest
 2025-03-20,External SSD,3000.00,Midwest
 2025-03-21,Beanie (Wool),45.00,Southwest
 2025-03-21,Desk Chair,250.00,West
 2025-03-22,Biochemistry Book,89.00,West
-2025-03-22,Professional Camera,35000000.00,PayPal
+2025-03-22,Professional Camera,35000000.00,West
 2025-03-24,Pharaoh's Burial Mask (Replica),150.00,West
 2025-03-25,Pharaoh's Burial Mask (Replica),92.00,West
 2025-03-25,Philosophy Book,10000000.00,South
@@ -445,7 +445,7 @@ OrderDate,ProductName,Revenue,SalesRegion
 2025-04-06,King Arthur's Sword (Legendary),70.00,Northeast
 2025-04-08,Full Body Armor Suit,700000.00,Northeast
 2025-04-10,Desk Chair,320.00,Mid-Atlantic
-2025-04-10,Historical Non-Fiction,5000000.00,Bank Transfer
+2025-04-10,Historical Non-Fiction,5000000.00,Mid-Atlantic
 2025-04-11,Children's Book Set,40.00,Northeast
 2025-04-12,Smart Scale,4000.00,Southwest
 2025-04-13,King Arthur's Sword (Legendary),250.00,Midwest
@@ -457,11 +457,11 @@ OrderDate,ProductName,Revenue,SalesRegion
 2025-04-20,First Edition of Moby Dick,800.00,South
 2025-04-22,Leather Gloves,15000000.00,South
 2025-04-24,Beanie (Wool),3000.00,South
-2025-04-24,Portable Radio,28000000.00,PayPal
+2025-04-24,Portable Radio,28000000.00,South
 2025-04-25,Data Science Book,95.00,South
 2025-04-26,Wireless Mouse,120.00,West
 2025-04-27,Portable Radio,88.00,West
-2025-04-29,Windbreaker Jacket,18000000.00,PayPal
+2025-04-29,Windbreaker Jacket,18000000.00,West
 2025-05-01,Children's Book Set,108.00,West
 2025-05-02,Portable Radio,83.00,West
 2025-05-06,Historical Non-Fiction,1100000.00,Mid-Atlantic
