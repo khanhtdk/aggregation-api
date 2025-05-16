@@ -7,6 +7,6 @@ build/
 *.egg
 *.egg-info/
 __pycache__/
-db.sqlite3
+db.sqlite
 *.iml
 **/migrations/[0-9]*.py
