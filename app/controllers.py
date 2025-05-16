@@ -50,4 +50,12 @@ class MonthlySalesQuery(BaseQuery):
                 GROUP BY year, month
                 ORDER BY year, month
             ''',
+
+            # Query that leverages slit date feature from SplitDateOrder
+            '''
+                SELECT year, month, SUM(revenue)
+                FROM split_date_orders
+                GROUP BY year, month
+                ORDER BY year, month
+            ''',
         ]
