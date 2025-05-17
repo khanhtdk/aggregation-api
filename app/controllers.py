@@ -6,29 +6,37 @@ from .utils import SQLite
 
 
 class BaseQuery(ABC):
-    def __init__(self, profile: int = 0):
+    def __init__(self, profile: int):
         """
         :param profile:     Which profile is selected. Default is the first
                             profile starting from 0.
         """
-        self.profile: int = profile
+        # Validate profile
+        if not isinstance(profile, int) or profile < 1:
+            raise ValueError('Profile must be an integer >= 1')
+
+        # Select query based on input profile
+        try:
+            self.query = self.available_queries()[profile - 1]
+        except IndexError:
+            raise ValueError(f'Profile {profile} does not exist')
+
+        # Init SQLite wrapper as `db` instance
         self.db = SQLite(app.config['DATABASE_FILE'])
 
     @abstractmethod
-    def available_profiles(self) -> List[str]:
+    def available_queries(self) -> List[str]:
         """
         Returns a list of query statements. Each query statement serves a
         performance profile and can be retrieved by its index.
         """
 
     def parse_results(self, results):
+        """Parses the results of executed query into usable data."""
         return results
 
-    @property
-    def query(self) -> str:
-        return self.available_profiles()[self.profile]
-
     def __call__(self):
+        """Executes the selected profile's query and returns parsed results."""
         with self.db as conn:
             return self.parse_results(conn.fetchall(self.query))
 
@@ -38,7 +46,7 @@ class MonthlySalesQuery(BaseQuery):
         parse = lambda i: {'year': i[0], 'month': i[1], 'revenue': i[2]}
         return list(map(parse, results))
 
-    def available_profiles(self) -> List[str]:
+    def available_queries(self) -> List[str]:
         return [
             # Query that uses the original Order model and leverages STRFTIME
             '''

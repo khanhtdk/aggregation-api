@@ -8,11 +8,11 @@ class MonthlySalesTestCase(BaseTest):
         Query that uses the first profile of the controller which applies to the
         original Order model.
         """
-        self.time(MonthlySalesQuery())
+        self.time(MonthlySalesQuery(profile=1))
 
     def test_split_date_query(self):
         """
         Query that uses the second profile of the controller which applies to the
         optimized SplitDateOrder model.
         """
-        self.time(MonthlySalesQuery(1))
+        self.time(MonthlySalesQuery(profile=2))
