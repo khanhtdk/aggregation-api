@@ -42,6 +42,20 @@ class BaseQuery(ABC):
 
 
 class MonthlySalesQuery(BaseQuery):
+    """
+    The controller used for querying monthly sales data. It has 3 available
+    profiles as follows:
+
+        * Profile 1:    Query that extracts `year` and `month` from `date` field
+                        using STRFTIME().
+
+        * Profile 2:    Query that directly uses pre-populated `year` and `month`
+                        fields.
+
+        * Profile 3:    Query that uses pre-populated `indexed_year` and `indexed_month`
+                        fields with composite index enabled.
+    """
+
     def parse_results(self, results) -> List[Dict[str, str | float]]:
         parse = lambda i: {'year': i[0], 'month': i[1], 'revenue': i[2]}
         return list(map(parse, results))
@@ -55,11 +69,7 @@ class MonthlySalesQuery(BaseQuery):
             ORDER BY selected_year, selected_month;
         '''
         return [
-            # Query that extracts `year` and `month` using STRFTIME:
-            base_query.format(year=strftime('%Y'), month=strftime('%m')),
-            # Query that uses pre-populated `year` and `month` fields:
-            base_query.format(year='year', month='month'),
-            # Query that uses pre-populated `indexed_year` and `indexed_month`
-            # fields with composite index enabled:
-            base_query.format(year='indexed_year', month='indexed_month'),
+            base_query.format(year=strftime('%Y'), month=strftime('%m')),  # profile 1
+            base_query.format(year='year', month='month'),  # profile 2
+            base_query.format(year='indexed_year', month='indexed_month'),  # profile 3
         ]
