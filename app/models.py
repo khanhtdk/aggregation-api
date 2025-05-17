@@ -44,24 +44,6 @@ class Order(db.Model, ModelUtils):
 
     id = db.Column(db.Integer, primary_key=True)
     date_purchased = db.Column(db.Date, nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
-    revenue = db.Column(db.Numeric(10, 2, asdecimal=False), nullable=False)
-    region_id = db.Column(db.Integer, db.ForeignKey('regions.id'), nullable=False)
-
-    @classmethod
-    def new(cls, date_purchased: datetime.date, product: Product, revenue: float, region: Region) -> 'Order':
-        return super().new(
-            date_purchased=date_purchased,
-            product_id=product.id,
-            revenue=revenue,
-            region_id=region.id
-        )
-
-
-class SplitDateOrder(db.Model, ModelUtils):
-    __tablename__ = 'split_date_orders'
-
-    id = db.Column(db.Integer, primary_key=True)
 
     # Split `date_purchased` into 3 separate fields
     year = db.Column(db.String(4), nullable=False)

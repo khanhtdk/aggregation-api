@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Dict
 
 from . import app
 from .utils import SQLite
@@ -34,7 +34,7 @@ class BaseQuery(ABC):
 
 
 class MonthlySalesQuery(BaseQuery):
-    def parse_results(self, results):
+    def parse_results(self, results) -> List[Dict[str, str | float]]:
         parse = lambda i: {'year': i[0], 'month': i[1], 'revenue': i[2]}
         return list(map(parse, results))
 
@@ -54,7 +54,7 @@ class MonthlySalesQuery(BaseQuery):
             # Query that leverages slit date feature from SplitDateOrder
             '''
                 SELECT year, month, SUM(revenue)
-                FROM split_date_orders
+                FROM orders
                 GROUP BY year, month
                 ORDER BY year, month
             ''',
