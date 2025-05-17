@@ -95,7 +95,7 @@ class FilteredSalesQuery(BaseQuery):
             elif key == 'start_date':
                 conditions.append(f"date >= '{value}'")
             elif key == 'end_date':
-                conditions.append(f"date <= '{value}'")
+                conditions.append(f"date < '{value}'")
             else:
                 raise KeyError(f'Unknown parameter {key!r}')
         if conditions:
@@ -104,10 +104,19 @@ class FilteredSalesQuery(BaseQuery):
 
     def available_queries(self) -> List[str]:
         return [
+            # Profile 1: uses original `date`, `product_id`, and `region_id` fields
             '''
-                SELECT s.id, s.date, p.name AS product_name, s.revenue, r.name AS region_name
+                SELECT s.id, s.date AS date, p.name AS product_name, s.revenue, r.name AS region_name
                 FROM sales AS s
-                INNER JOIN products AS p ON s.product_id = p.id
-                INNER JOIN regions AS r ON s.region_id = r.id
+                JOIN products AS p ON s.product_id = p.id
+                JOIN regions AS r ON s.region_id = r.id
+            ''',
+
+            # Profile 2: uses indexed versions of `date`, `product_id`, and `region_id`
+            '''
+                SELECT s.id, s.indexed_date AS date, p.name AS product_name, s.revenue, r.name AS region_name
+                FROM sales AS s
+                JOIN products AS p ON s.indexed_product_id = p.id
+                JOIN regions AS r ON s.indexed_region_id = r.id
             '''
         ]

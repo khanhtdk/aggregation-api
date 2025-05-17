@@ -72,6 +72,10 @@ class Sale(db.Model, ModelUtils):
 
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, nullable=False)
+    revenue = db.Column(db.Numeric(10, 2, asdecimal=False), nullable=False)
+
+    # Indexed version of `date` field
+    indexed_date = db.Column(db.Date, nullable=False, index=True)
 
     # Split `date` into 3 separate fields
     year = db.Column(db.String(4), nullable=False)
@@ -82,11 +86,16 @@ class Sale(db.Model, ModelUtils):
     indexed_year = db.Column(db.String(4), nullable=False)
     indexed_month = db.Column(db.String(2), nullable=False)
 
+    # No indexed foreign keys
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
-    revenue = db.Column(db.Numeric(10, 2, asdecimal=False), nullable=False)
     region_id = db.Column(db.Integer, db.ForeignKey('regions.id'), nullable=False)
 
+    # Indexed foreign keys
+    indexed_product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False, index=True)
+    indexed_region_id = db.Column(db.Integer, db.ForeignKey('regions.id'), nullable=False, index=True)
+
     __table_args__ = (
+        # Composite index for `indexed_year` and `indexed_month`
         Index('idx_year_month', indexed_year, indexed_month),
     )
 
@@ -95,12 +104,15 @@ class Sale(db.Model, ModelUtils):
         year, month, day = date.strftime('%Y-%m-%d').split('-')
         return super().new(
             date=date,
+            indexed_date=date,
             year=year,
             month=month,
             day=day,
             indexed_year=year,
             indexed_month=month,
             product_id=product.id,
+            region_id=region.id,
+            indexed_product_id=product.id,
+            indexed_region_id=region.id,
             revenue=revenue,
-            region_id=region.id
         )
