@@ -47,12 +47,12 @@ class MonthlySalesQuery(BaseQuery):
         return list(map(parse, results))
 
     def available_queries(self) -> List[str]:
-        strftime = lambda fmt: f'''STRFTIME('{fmt}', date_purchased)'''
+        strftime = lambda fmt: f'''STRFTIME('{fmt}', date)'''
         base_query = '''
             SELECT {year} AS selected_year, {month} AS selected_month, SUM(revenue)
             FROM orders
             GROUP BY selected_year, selected_month
-            ORDER BY selected_year, selected_month
+            ORDER BY selected_year, selected_month;
         '''
         return [
             # Query that extracts `year` and `month` using STRFTIME:

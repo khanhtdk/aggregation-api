@@ -1,4 +1,4 @@
-OrderDate,ProductName,Revenue,SalesRegion
+SaleDate,ProductName,Revenue,SaleRegion
 2024-01-01,Rain Jacket,20.00,Midwest
 2024-01-04,Children's Book Set,250.00,South
 2024-01-06,Genghis Khan's Helmet (Possible),100.00,South

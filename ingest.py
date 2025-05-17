@@ -7,7 +7,7 @@ from dataclasses import dataclass, field, InitVar
 from typing import List
 
 from app import app
-from app.models import db, Order, Product, Region
+from app.models import db, Sale, Product, Region
 
 
 class CsvData:
@@ -18,10 +18,10 @@ class CsvData:
         """Data struct that parses a single row of CSV file."""
 
         # Mandatory fields
-        order_date: datetime.date = field(init=False)
+        sale_date: datetime.date = field(init=False)
         product_name: str = field(init=False)
         revenue: float = field(init=False)
-        sales_region: str = field(init=False)
+        sale_region: str = field(init=False)
 
         # Accepts raw data of the CSV row as input
         csv_row: InitVar[List[str]]
@@ -32,17 +32,17 @@ class CsvData:
                 date, prod, revenue, region = csv_row
                 assert date and prod and revenue and region, 'fields must be all set'
                 assert isinstance(prod, str), 'product_name must be string'
-                assert isinstance(region, str), 'sales_region must be string'
+                assert isinstance(region, str), 'sale_region must be string'
                 date = datetime.strptime(date, '%Y-%m-%d').date()
                 revenue = float(revenue)
             except (ValueError, TypeError, AssertionError) as e:
                 raise ValueError(e)
 
             # Update mandatory fields
-            self.order_date = date
+            self.sale_date = date
             self.product_name = prod
             self.revenue = revenue
-            self.sales_region = region
+            self.sale_region = region
 
     @classmethod
     def from_file(cls, csv_file: str, has_header: bool) -> 'CsvData':
@@ -86,7 +86,7 @@ def ingest(data: CsvData):
     # Start ingesting data
     for row in data:
         # Get or create region if not existed
-        region, created = Region.get_or_create(name=row.sales_region)
+        region, created = Region.get_or_create(name=row.sale_region)
         if created:
             print(f'Created {region!r}')
 
@@ -95,9 +95,9 @@ def ingest(data: CsvData):
         if created:
             print(f'Created {product!r}')
 
-        # Created order
-        order = Order.new(row.order_date, product, row.revenue, region)
-        print(f'Created {order!r}')
+        # Created sale
+        sale = Sale.new(row.sale_date, product, row.revenue, region)
+        print(f'Created {sale!r}')
 
 
 def get_args() -> Namespace:

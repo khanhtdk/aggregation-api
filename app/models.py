@@ -40,13 +40,13 @@ class Region(db.Model, ModelUtils):
     name = db.Column(db.String(32), nullable=False, unique=True)
 
 
-class Order(db.Model, ModelUtils):
-    __tablename__ = 'orders'
+class Sale(db.Model, ModelUtils):
+    __tablename__ = 'sales'
 
     id = db.Column(db.Integer, primary_key=True)
-    date_purchased = db.Column(db.Date, nullable=False)
+    date = db.Column(db.Date, nullable=False)
 
-    # Split `date_purchased` into 3 separate fields
+    # Split `date` into 3 separate fields
     year = db.Column(db.String(4), nullable=False)
     month = db.Column(db.String(2), nullable=False)
     day = db.Column(db.String(2), nullable=False)
@@ -64,10 +64,10 @@ class Order(db.Model, ModelUtils):
     )
 
     @classmethod
-    def new(cls, date_purchased: datetime.date, product: Product, revenue: float, region: Region) -> 'Order':
-        year, month, day = date_purchased.strftime('%Y-%m-%d').split('-')
+    def new(cls, date: datetime.date, product: Product, revenue: float, region: Region) -> 'Sale':
+        year, month, day = date.strftime('%Y-%m-%d').split('-')
         return super().new(
-            date_purchased=date_purchased,
+            date=date,
             year=year,
             month=month,
             day=day,
