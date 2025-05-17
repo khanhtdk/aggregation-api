@@ -2,17 +2,22 @@ from app.controllers import MonthlySalesQuery
 from tests import BaseTest
 
 
-class MonthlySalesTestCase(BaseTest):
-    def test_original_query(self):
+class MonthlySalesQueryController(BaseTest):
+    def test_profile_1(self):
         """
-        Query that uses the first profile of the controller which applies to the
-        original Order model.
+        Test MonthlySalesQuery controller: Profile #1 (use unoptimized query).
         """
         self.time(MonthlySalesQuery(profile=1))
 
-    def test_split_date_query(self):
+    def test_profile_2(self):
         """
-        Query that uses the second profile of the controller which applies to the
-        optimized SplitDateOrder model.
+        Test MonthlySalesQuery controller: Profile #2 (use split date query).
         """
         self.time(MonthlySalesQuery(profile=2))
+
+    def test_profile_3(self):
+        """
+        Test MonthlySalesQuery controller: Profile #3 (use split date query with
+        composite index).
+        """
+        self.time(MonthlySalesQuery(profile=3))
