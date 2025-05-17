@@ -47,23 +47,19 @@ class MonthlySalesQuery(BaseQuery):
         return list(map(parse, results))
 
     def available_queries(self) -> List[str]:
+        strftime = lambda fmt: f'''STRFTIME('{fmt}', date_purchased)'''
+        base_query = '''
+            SELECT {year} AS selected_year, {month} AS selected_month, SUM(revenue)
+            FROM orders
+            GROUP BY selected_year, selected_month
+            ORDER BY selected_year, selected_month
+        '''
         return [
-            # Query that uses the original Order model and leverages STRFTIME
-            '''
-                SELECT
-                    STRFTIME('%Y', date_purchased) AS year,
-                    STRFTIME('%m', date_purchased) AS month,
-                    SUM(revenue)
-                FROM orders
-                GROUP BY year, month
-                ORDER BY year, month
-            ''',
-
-            # Query that leverages slit date feature from SplitDateOrder
-            '''
-                SELECT year, month, SUM(revenue)
-                FROM orders
-                GROUP BY year, month
-                ORDER BY year, month
-            ''',
+            # Query that extracts `year` and `month` using STRFTIME:
+            base_query.format(year=strftime('%Y'), month=strftime('%m')),
+            # Query that uses pre-populated `year` and `month` fields:
+            base_query.format(year='year', month='month'),
+            # Query that uses pre-populated `indexed_year` and `indexed_month`
+            # fields with composite index enabled:
+            base_query.format(year='indexed_year', month='indexed_month'),
         ]

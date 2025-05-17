@@ -2,8 +2,9 @@ import datetime
 from typing import Tuple
 
 from flask_sqlalchemy import SQLAlchemy
-from . import app
+from sqlalchemy import Index
 
+from . import app
 db = SQLAlchemy(app)
 
 
@@ -50,9 +51,17 @@ class Order(db.Model, ModelUtils):
     month = db.Column(db.String(2), nullable=False)
     day = db.Column(db.String(2), nullable=False)
 
+    # Indexed versions of `year` and `month` fields
+    indexed_year = db.Column(db.String(4), nullable=False)
+    indexed_month = db.Column(db.String(2), nullable=False)
+
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
     revenue = db.Column(db.Numeric(10, 2, asdecimal=False), nullable=False)
     region_id = db.Column(db.Integer, db.ForeignKey('regions.id'), nullable=False)
+
+    __table_args__ = (
+        Index('idx_year_month', indexed_year, indexed_month),
+    )
 
     @classmethod
     def new(cls, date_purchased: datetime.date, product: Product, revenue: float, region: Region) -> 'Order':
@@ -62,6 +71,8 @@ class Order(db.Model, ModelUtils):
             year=year,
             month=month,
             day=day,
+            indexed_year=year,
+            indexed_month=month,
             product_id=product.id,
             revenue=revenue,
             region_id=region.id
