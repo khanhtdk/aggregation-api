@@ -9,8 +9,15 @@ db = SQLAlchemy(app)
 
 
 class ModelUtils:
+    """Convenient utilities for CRUD operations."""
+
     @classmethod
     def new(cls, **kwargs) -> db.Model:
+        """
+        Newly creates a model object.
+
+        :param kwargs:    Required fields for creating the object.
+        """
         obj = cls(**kwargs)
         db.session.add(obj)
         db.session.commit()
@@ -18,6 +25,15 @@ class ModelUtils:
 
     @classmethod
     def get_or_create(cls, defaults=None, **queries) -> Tuple[db.Model, bool]:
+        """
+        Looks up the object against the input queries, creates one if not existed,
+        then returns the object.
+
+        :param defaults:    A mapping of field-value pairs serves as supplement
+                            info that is useful for creating the object.
+        :param queries:     Keyword arguments (mandatory fields) required for
+                            querying and creating the object.
+        """
         obj = db.session.query(cls).filter_by(**queries).one_or_none()
         existed = obj is not None
         if not existed:
@@ -27,6 +43,8 @@ class ModelUtils:
 
 
 class Product(db.Model, ModelUtils):
+    """Contains all available products."""
+
     __tablename__ = 'products'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -34,6 +52,8 @@ class Product(db.Model, ModelUtils):
 
 
 class Region(db.Model, ModelUtils):
+    """Contains all available regions."""
+
     __tablename__ = 'regions'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -41,6 +61,13 @@ class Region(db.Model, ModelUtils):
 
 
 class Sale(db.Model, ModelUtils):
+    """
+    This table contains all sales data ingested by the `ingest.py` script and is
+    created for testing purpose only. Though it contains duplicated fields,
+    those fields are intentionally added in order to support validating and
+    experimenting the performance tests.
+    """
+
     __tablename__ = 'sales'
 
     id = db.Column(db.Integer, primary_key=True)
