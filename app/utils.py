@@ -1,3 +1,4 @@
+import datetime
 import sqlite3
 from contextlib import closing
 from typing import Optional, Tuple, List, Any
@@ -5,6 +6,14 @@ from typing import Optional, Tuple, List, Any
 
 class SQLite:
     """Simple wrapper for handling direct connection to SQLite."""
+
+    @staticmethod
+    def expects_date(value: str) -> bool:
+        try:
+            datetime.datetime.strptime(value, '%Y-%m-%d')
+            return True
+        except (ValueError, TypeError):
+            return False
 
     def __init__(self, db_file: str):
         self.db_file: str = db_file
