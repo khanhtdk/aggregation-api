@@ -8,3 +8,9 @@ class ProductTopFiveQueryController(BaseTest):
         Test ProductTopFiveQuery controller: Profile #1 (no idexes).
         """
         self.time(ProductTopFiveQuery(profile=1))
+
+    def test_profile_2(self):
+        """
+        Test ProductTopFiveQuery controller: Profile #2 (indexed).
+        """
+        self.time(ProductTopFiveQuery(profile=2))

@@ -212,12 +212,21 @@ class FilteredSalesQuery(BaseQuery):
 
 
 class ProductTopFiveQuery(BaseQuery):
+    """
+    This controller returns top five products based on sales revenue. There are
+    2 profiles implemented:
+
+        * Profile 1:    Query without using indexes.
+
+        * Profile 2:    Query with indexing fully enabled.
+    """
     def parse_results(self, results):
         columns = ['product_name', 'total_revenue']
         return list(map(lambda res: dict(zip(columns, res)), results))
 
     def query_profiles(self) -> List[str]:
         return [
+            # Profile 1
             '''
                 SELECT p.name AS product_name, SUM(s.revenue) AS total_revenue
                 FROM sales s
@@ -225,5 +234,15 @@ class ProductTopFiveQuery(BaseQuery):
                 GROUP BY product_name
                 ORDER BY total_revenue DESC
                 LIMIT 5;
+            ''',
+
+            # Profile 2
             '''
+                SELECT p.name AS product_name, SUM(s.indexed_revenue) AS total_revenue
+                FROM sales s
+                JOIN products p ON s.indexed_product_id = p.id
+                GROUP BY product_name
+                ORDER BY total_revenue DESC
+                LIMIT 5;
+            ''',
         ]

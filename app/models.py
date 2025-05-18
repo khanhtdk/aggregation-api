@@ -99,9 +99,14 @@ class Sale(db.Model, ModelUtils):
     indexed_product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False, index=True)
     indexed_region_id = db.Column(db.Integer, db.ForeignKey('regions.id'), nullable=False, index=True)
 
+    # Indexed version of `revenue`
+    indexed_revenue = db.Column(db.Numeric(10, 2, asdecimal=False), nullable=False)
+
     __table_args__ = (
         # Composite index for `indexed_year` and `indexed_month`
         Index('idx_year_month', indexed_year, indexed_month),
+        # Index for revenue by descending order
+        Index('idx_revenue_desc', indexed_revenue.desc()),
     )
 
     @classmethod
@@ -127,6 +132,7 @@ class Sale(db.Model, ModelUtils):
             indexed_product_id=product.id,
             indexed_region_id=region.id,
             revenue=revenue,
+            indexed_revenue=revenue,
         )
 
 
