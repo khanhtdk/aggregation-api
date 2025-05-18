@@ -5,7 +5,12 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Index
 
 from . import app
+
+# Init db session wrapper
 db = SQLAlchemy(app)
+
+# Init current year context
+CURRENT_YEAR = int(app.config.get('CURRENT_YEAR_CONTEXT', datetime.date.today().year))
 
 
 class ModelUtils:
@@ -101,7 +106,14 @@ class Sale(db.Model, ModelUtils):
 
     @classmethod
     def new(cls, date: datetime.date, product: Product, revenue: float, region: Region) -> 'Sale':
+        # Split date into year, month, and day.
         year, month, day = date.strftime('%Y-%m-%d').split('-')
+
+        # Insert a copy of sale record on a respective partitioned table.
+        partition = (BeforeCurrentYearSale, CurrentYearSale)[int(year) == CURRENT_YEAR]
+        partition.new(date=date, product_id=product.id, region_id=region.id, revenue=revenue)
+
+        # Create the mainstream sale record and return
         return super().new(
             date=date,
             indexed_date=date,
@@ -116,3 +128,34 @@ class Sale(db.Model, ModelUtils):
             indexed_region_id=region.id,
             revenue=revenue,
         )
+
+
+class PartitionedSale:
+    """
+    This pseudo class defines a schema for those which are partitioned tables,
+    and of which this class is superclass.
+
+    This methodology of partitioning is created for demo purpose only to solve
+    the limitation of SQLite when it doesn't support physical partitioning.
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.Date, nullable=False, index=True)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False, index=True)
+    region_id = db.Column(db.Integer, db.ForeignKey('regions.id'), nullable=False, index=True)
+    revenue = db.Column(db.Numeric(10, 2, asdecimal=False), nullable=False)
+
+
+class BeforeCurrentYearSale(db.Model, PartitionedSale, ModelUtils):
+    """
+    This table holds a partition of sales data made before the context of
+    CURRENT_YEAR.
+    """
+    __tablename__ = 'before_current_year_sales'
+
+
+class CurrentYearSale(db.Model, PartitionedSale, ModelUtils):
+    """
+    This table holds a partition of sales data made starting from the context of
+    CURRENT_YEAR.
+    """
+    __tablename__ = 'current_year_sales'
