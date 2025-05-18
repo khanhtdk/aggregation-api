@@ -7,19 +7,23 @@ from .utils import SQLite
 
 
 class BaseQuery(ABC):
-    def __init__(self, profile: int, **params):
+    def __init__(self, profile: int = None, **params):
         """
         :param profile:    Which profile is selected. Default is the first
                            profile starting from 0.
         :param params:     Custom parameters for populating the query.
         """
         # Validate profile
-        if not isinstance(profile, int) or profile < 1:
+        if profile is not None and (not isinstance(profile, int) or profile < 1):
             raise ValueError('Profile must be an integer >= 1')
 
         # Select query based on input profile
         try:
-            self.query = self.query_profiles()[profile - 1]
+            queries = self.query_profiles()
+            if profile is None:
+                # Use the most optimized profile by default
+                profile = len(queries)
+            self.query = queries[profile - 1]
             self.profile = profile
         except IndexError:
             raise ValueError(f'Profile {profile} does not exist')
