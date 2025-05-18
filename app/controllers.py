@@ -201,11 +201,29 @@ class FilteredSalesQuery(BaseQuery):
                 JOIN regions r ON s.indexed_region_id = r.id
             ''',
 
-            # Profile 3: uses partitioned tables
+            # Profile 3: uses indexed versions and partitioned tables
             '''
                 SELECT s.date, p.name AS product_name, s.revenue, r.name AS region_name
                 FROM {table} s
                 JOIN products p ON s.product_id = p.id
                 JOIN regions r ON s.region_id = r.id
             ''',
+        ]
+
+
+class ProductTopFiveQuery(BaseQuery):
+    def parse_results(self, results):
+        columns = ['product_name', 'total_revenue']
+        return list(map(lambda res: dict(zip(columns, res)), results))
+
+    def query_profiles(self) -> List[str]:
+        return [
+            '''
+                SELECT p.name AS product_name, SUM(s.revenue) AS total_revenue
+                FROM sales s
+                JOIN products p ON s.product_id = p.id
+                GROUP BY product_name
+                ORDER BY total_revenue DESC
+                LIMIT 5;
+            '''
         ]
