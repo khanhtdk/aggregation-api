@@ -9,6 +9,7 @@ class BaseTest(unittest.TestCase):
     def setUp(self):
         self.ctx = app.app_context()
         self.ctx.push()
+        self.total_attempts = 200
 
     def tearDown(self):
         self.ctx.pop()
@@ -17,5 +18,5 @@ class BaseTest(unittest.TestCase):
         """
         Executes the input `func` and prints out its elapsed time in milliseconds.
         """
-        elapsed = timeit.timeit(func, number=200) * 1000
+        elapsed = timeit.timeit(func, number=self.total_attempts) * 1000
         print(f'elapsed {elapsed:.2f}ms')
