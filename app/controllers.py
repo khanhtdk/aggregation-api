@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from hashlib import md5
 from typing import List, Dict
+from urllib.parse import urlencode
 
 from flask_caching import Cache
 
@@ -35,10 +36,13 @@ class BaseQuery(ABC):
         except IndexError:
             raise ValueError(f'Profile {profile} does not exist')
 
-        # Init inner attrs
+        # Save inner attrs
         self.cache = bool(cache)
         self.profile = profile
-        self.query_key = md5(self.query.encode()).hexdigest()
+
+        # Create query key to support caching
+        encoded_params = urlencode({'profile': profile, **params})
+        self.query_key = md5((self.query + encoded_params).encode()).hexdigest()
 
         # Query population
         self.populate_query(**params)
