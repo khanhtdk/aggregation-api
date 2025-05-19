@@ -2,7 +2,7 @@ import datetime
 import sqlite3
 from contextlib import closing
 from functools import wraps
-from typing import Optional, Tuple, List, Any
+from typing import Optional, Tuple, List, Any, Callable
 
 from flask import request, abort
 
@@ -48,13 +48,20 @@ class SimpleAuthByHeader:
     `False`.
     """
 
-    def __init__(self, header_name: str, secret_key: str):
+    def __init__(self, header_name: str, secret_key: str | Callable):
         """
         :param header_name:    Request header that contains a secret key.
-        :param secret_key:     Secret key used for authentication.
+        :param secret_key:     Secret key used for authentication. A callable
+                               is accepted for lazy loading.
         """
         self.header_name = header_name
-        self.secret_key = secret_key
+        self._secret_key = secret_key
+
+    @property
+    def secret_key(self):
+        if callable(self._secret_key):
+            self._secret_key = self._secret_key()
+        return self._secret_key
 
     def protects(self, func):
         """Enables authentication functionality for wrapped methods."""

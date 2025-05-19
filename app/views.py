@@ -10,7 +10,7 @@ from .utils import SimpleAuthByHeader, SQLite, getbool
 # Init auth instance
 auth = SimpleAuthByHeader(
     header_name='X-Api-Key',
-    secret_key=app.config['API_SECRET_KEY'],
+    secret_key=lambda: app.config['API_SECRET_KEY'],
 )
 
 
