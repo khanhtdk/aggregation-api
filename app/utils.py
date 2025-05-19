@@ -8,12 +8,12 @@ class SQLite:
     """Simple wrapper for handling direct connection to SQLite."""
 
     @staticmethod
-    def expects_date(value: str) -> bool:
+    def validates_date(value: str) -> str:
         try:
             datetime.datetime.strptime(value, '%Y-%m-%d')
-            return True
+            return value
         except (ValueError, TypeError):
-            return False
+            raise ValueError(f'Value {value!r} is not a valid date string')
 
     def __init__(self, db_file: str):
         self.db_file: str = db_file

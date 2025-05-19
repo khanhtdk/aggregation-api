@@ -13,7 +13,10 @@ from .utils import SQLite
 _cache = Cache(app)
 
 
-class BaseQuery(ABC):
+class ParamError(Exception):
+    """Raised when parameter validation is failed."""
+
+
 class BaseQueryController(ABC):
     def __init__(self, profile: int = None, cache=False, **params):
         """
@@ -25,7 +28,7 @@ class BaseQueryController(ABC):
         """
         # Validate profile
         if profile is not None and (not isinstance(profile, int) or profile < 1):
-            raise ValueError('Profile must be an integer >= 1')
+            raise ParamError('Profile must be an integer >= 1')
 
         # Select query based on input profile
         try:
@@ -35,7 +38,7 @@ class BaseQueryController(ABC):
                 profile = len(queries)
             self.query = queries[profile - 1]
         except IndexError:
-            raise ValueError(f'Profile {profile} does not exist')
+            raise ParamError(f'Profile {profile} does not exist')
 
         # Save inner attrs
         self.cache = bool(cache)
@@ -137,10 +140,13 @@ class FilteredSalesQuery(BaseQueryController):
         # Initial conditions
         conditions = []
 
-        def validate_date(d):
-            """Validates date value."""
-            if not SQLite.expects_date(d):
-                raise ValueError(f'Value {d!r} is not a valid date')
+        def get_year(d):
+            """Extracts year from date value."""
+            try:
+                SQLite.validates_date(d)
+                return d.split('-')[0]
+            except ValueError as e:
+                raise ParamError(e)
 
         def range_condition(start=None, end=None) -> str:
             """Constructs range condition from start and/or end dates."""
@@ -150,7 +156,7 @@ class FilteredSalesQuery(BaseQueryController):
                 return f'date >= {start!r}'
             if end:
                 return f'date <= {end!r}'
-            raise AssertionError('No input')
+            raise AssertionError('Either `start` or `end` is required')
 
         def where_clause(start=None, end=None) -> str:
             """
@@ -168,20 +174,18 @@ class FilteredSalesQuery(BaseQueryController):
         # Validate start date if set
         start_year_is_current = False
         if start_date:
-            validate_date(start_date)
-            start_year = start_date.split('-')[0]
-            start_year_is_current = int(start_year) >= CURRENT_YEAR
+            year = get_year(start_date)
+            start_year_is_current = int(year) >= CURRENT_YEAR
 
         # Validate end date if set
         end_year_is_past = False
         if end_date:
-            validate_date(end_date)
-            end_year = end_date.split('-')[0]
-            end_year_is_past = int(end_year) < CURRENT_YEAR
+            year = get_year(end_date)
+            end_year_is_past = int(year) < CURRENT_YEAR
 
         # Ensure start date is before end date if both are set
         if start_date and end_date and start_date >= end_date:
-            raise ValueError(f'`start_date` must be before `end_date`')
+            raise ParamError(f'`start_date` must be before `end_date`')
 
         # Insert condition for product name if set
         if product_name:
