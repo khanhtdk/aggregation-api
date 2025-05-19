@@ -13,3 +13,7 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 # Which year in the ingested dataset is treated as current year? If not
 # specifying, it is calculated using current time.
 CURRENT_YEAR_CONTEXT = 2025
+
+# Default settings for Flask-Caching
+CACHE_TYPE = 'SimpleCache'  # uses python dict
+CACHE_DEFAULT_TIMEOUT = 60  # seconds
