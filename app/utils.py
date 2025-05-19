@@ -1,7 +1,10 @@
 import datetime
 import sqlite3
 from contextlib import closing
+from functools import wraps
 from typing import Optional, Tuple, List, Any
+
+from flask import request, abort
 
 
 class SQLite:
@@ -35,3 +38,37 @@ class SQLite:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._conn.close()
         self._conn = None
+
+
+class SimpleAuthByHeader:
+    """
+    A simple class for authenticating a request that reads value from the
+    pre-defined header, matches the found value against its configured secret
+    key, and returns `True` if both values are matched, otherwise it returns
+    `False`.
+    """
+
+    def __init__(self, header_name: str, secret_key: str):
+        """
+        :param header_name:    Request header that contains a secret key.
+        :param secret_key:     Secret key used for authentication.
+        """
+        self.header_name = header_name
+        self.secret_key = secret_key
+
+    def protects(self, func):
+        """Enables authentication functionality for wrapped methods."""
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            # Reads secret key from request header
+            secret_key = request.headers.get(self.header_name)
+            # Ensures secret key from request header is set
+            if not secret_key:
+                abort(401, 'Authentication required')
+            # Checks if the request secret key matches the configured secret key
+            if secret_key != self.secret_key:
+                abort(401, 'Invalid secret key')
+            # Successfully authenticated
+            return func(*args, **kwargs)
+        return wrapper
