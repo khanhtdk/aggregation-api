@@ -1,16 +1,24 @@
 from abc import ABC, abstractmethod
+from hashlib import md5
 from typing import List, Dict
+
+from flask_caching import Cache
 
 from . import app
 from .models import CURRENT_YEAR, BeforeCurrentYearSale, CurrentYearSale
 from .utils import SQLite
 
+# Init cache
+_cache = Cache(app)
+
 
 class BaseQuery(ABC):
-    def __init__(self, profile: int = None, **params):
+    def __init__(self, profile: int = None, cache=False, **params):
         """
-        :param profile:    Which profile is selected. Default is the first
-                           profile starting from 0.
+        :param profile:    Which profile is selected. Default is using the most
+                           optimized profile which is the last one found in
+                           profile list.
+        :param cache:      Whether to enable caching. Default is False.
         :param params:     Custom parameters for populating the query.
         """
         # Validate profile
@@ -24,9 +32,13 @@ class BaseQuery(ABC):
                 # Use the most optimized profile by default
                 profile = len(queries)
             self.query = queries[profile - 1]
-            self.profile = profile
         except IndexError:
             raise ValueError(f'Profile {profile} does not exist')
+
+        # Init inner attrs
+        self.cache = bool(cache)
+        self.profile = profile
+        self.query_key = md5(self.query.encode()).hexdigest()
 
         # Query population
         self.populate_query(**params)
@@ -50,8 +62,20 @@ class BaseQuery(ABC):
 
     def __call__(self):
         """Executes the selected profile's query and returns parsed results."""
+        if self.cache:
+            # Returns cached results if existed
+            results = _cache.get(self.query_key)
+            if results is not None:
+                return results
         with self.db as conn:
-            return self.parse_results(conn.fetchall(self.query))
+            results = self.parse_results(conn.fetchall(self.query))
+            if self.cache:
+                # Cache results for latter calls
+                _cache.set(self.query_key, results)
+            return results
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__} profile={self.profile}>'
 
 
 class MonthlySalesQuery(BaseQuery):
