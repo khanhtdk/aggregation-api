@@ -261,6 +261,9 @@ class TopProductsQuery(BaseQueryController):
         columns = ['product_name', 'total_revenue']
         return list(map(lambda res: dict(zip(columns, res)), results))
 
+    def populate_query(self, limit=None):
+        self.query = self.query.format(limit=limit or 5)
+
     def query_profiles(self) -> List[str]:
         return [
             # Profile 1
@@ -270,7 +273,7 @@ class TopProductsQuery(BaseQueryController):
                 JOIN products p ON s.product_id = p.id
                 GROUP BY product_name
                 ORDER BY total_revenue DESC
-                LIMIT 5;
+                LIMIT {limit};
             ''',
 
             # Profile 2
@@ -280,6 +283,6 @@ class TopProductsQuery(BaseQueryController):
                 JOIN products p ON s.indexed_product_id = p.id
                 GROUP BY product_name
                 ORDER BY total_revenue DESC
-                LIMIT 5;
+                LIMIT {limit};
             ''',
         ]
