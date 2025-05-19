@@ -14,6 +14,7 @@ _cache = Cache(app)
 
 
 class BaseQuery(ABC):
+class BaseQueryController(ABC):
     def __init__(self, profile: int = None, cache=False, **params):
         """
         :param profile:    Which profile is selected. Default is using the most
@@ -82,7 +83,7 @@ class BaseQuery(ABC):
         return f'<{self.__class__.__name__} profile={self.profile}>'
 
 
-class MonthlySalesQuery(BaseQuery):
+class MonthlySalesQuery(BaseQueryController):
     """
     The controller used for querying monthly sales data. It has 3 available
     profiles as follows:
@@ -116,7 +117,7 @@ class MonthlySalesQuery(BaseQuery):
         ]
 
 
-class FilteredSalesQuery(BaseQuery):
+class FilteredSalesQuery(BaseQueryController):
     """
     The controller that returns sales data matching a set of filters. It has 3
     profiles as follows:
@@ -243,7 +244,7 @@ class FilteredSalesQuery(BaseQuery):
         ]
 
 
-class ProductTopFiveQuery(BaseQuery):
+class TopProductsQuery(BaseQueryController):
     """
     This controller returns top five products based on sales revenue. There are
     2 profiles implemented:

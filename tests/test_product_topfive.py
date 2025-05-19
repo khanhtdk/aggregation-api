@@ -1,4 +1,4 @@
-from app.controllers import ProductTopFiveQuery
+from app.controllers import TopProductsQuery
 from tests import BaseTest
 
 
@@ -7,10 +7,10 @@ class ProductTopFiveQueryController(BaseTest):
         """
         Test ProductTopFiveQuery controller: Profile #1 (no idexes).
         """
-        self.time(ProductTopFiveQuery(profile=1))
+        self.time(TopProductsQuery(profile=1))
 
     def test_profile_2(self):
         """
         Test ProductTopFiveQuery controller: Profile #2 (indexed).
         """
-        self.time(ProductTopFiveQuery(profile=2))
+        self.time(TopProductsQuery(profile=2))
