@@ -9,10 +9,15 @@ class BaseTest(unittest.TestCase):
     def setUp(self):
         self.ctx = app.app_context()
         self.ctx.push()
-        self.total_attempts = 200
 
     def tearDown(self):
         self.ctx.pop()
+
+
+class ControllerTest(BaseTest):
+    def setUp(self):
+        super().setUp()
+        self.total_attempts = 200
 
     def time(self, func: Callable):
         """

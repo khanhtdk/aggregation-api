@@ -1,8 +1,8 @@
 from app.controllers import MonthlySalesQuery
-from tests import BaseTest
+from tests import ControllerTest
 
 
-class MonthlySalesQueryController(BaseTest):
+class MonthlySalesQueryController(ControllerTest):
     def test_profile_1(self):
         """
         Test MonthlySalesQuery controller: Profile #1 (strftime, no idexes).

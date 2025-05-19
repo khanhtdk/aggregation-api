@@ -1,9 +1,9 @@
 from app.controllers import FilteredSalesQuery
 from app.models import CURRENT_YEAR
-from tests import BaseTest
+from tests import ControllerTest
 
 
-class FilteredSalesQueryController(BaseTest):
+class FilteredSalesQueryController(ControllerTest):
     def setUp(self):
         super().setUp()
 

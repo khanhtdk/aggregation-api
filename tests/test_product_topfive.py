@@ -1,8 +1,8 @@
 from app.controllers import TopProductsQuery
-from tests import BaseTest
+from tests import ControllerTest
 
 
-class ProductTopFiveQueryController(BaseTest):
+class TopProductsQueryController(ControllerTest):
     def test_profile_1(self):
         """
         Test ProductTopFiveQuery controller: Profile #1 (no idexes).
