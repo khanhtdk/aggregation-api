@@ -72,3 +72,11 @@ class SimpleAuthByHeader:
             # Successfully authenticated
             return func(*args, **kwargs)
         return wrapper
+
+
+def getbool(value) -> bool:
+    """Returns a boolean if value is bool-alike."""
+    value = str(value).lower()
+    if value in ('1', 'true', 'on'): return True
+    if value in ('0', 'false', 'off'): return False
+    raise ValueError(f'Value {value!r} is not a valid boolean value')

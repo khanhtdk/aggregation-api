@@ -17,3 +17,7 @@ CURRENT_YEAR_CONTEXT = 2025
 # Default settings for Flask-Caching
 CACHE_TYPE = 'SimpleCache'  # uses python dict
 CACHE_DEFAULT_TIMEOUT = 60  # seconds
+
+# Set a secret key for accessing to self API. This value should be replaced when
+# being used in production.
+API_SECRET_KEY = '0123456789abcdefghijklmnopqrstuvwxyz'
