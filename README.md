@@ -31,7 +31,7 @@ $> docker build -t aggregation-api .
 $> docker run -d -p 5000:5000 --name aggregation-api --env API_SECRET_KEY=123abcxyz aggregation-api
 ```
 
-> **Notes:** You can set secret key for the API by specifying `--env API_SECRET_KEY=123abcxyz` into the run command above, and changing its value to another more secure string.
+> <u>**Notes**</u>: You can set secret key for the API by specifying `--env API_SECRET_KEY=123abcxyz` into the run command above, and changing its value to another more secure string.
 
 ## Data ingestion
 Before experimenting the tests, you need to ingest the running app with sample data. The file [sales-data.csv](sales-data.csv) existing in this project structure is the data that I have created for this purpose. Here is the command we use to do ingest:
@@ -123,7 +123,7 @@ Like the previous one, this controller is also built having 3 profiles of optimi
 * **Profile 2:** Indexes are enabled for all fields that are used for joining and filtering.
 * **Profile 3:** Includes optimizations from profile 2 plus partitioning data.
 
-> **Notes:** Due to SQLite limitation of not supporting data partitioning, the data is manually partitioned and stored in 2 separate tables, one table keeps the data of current year and the other keeps the rest. The value of current year is determined by `CURRENT_YEAR_CONTEXT` setting in [config.py](config.py), or it will be calculated using the current time if not defined.
+> <u>**Notes**</u>: Due to SQLite limitation of not supporting data partitioning, the data is manually partitioned and stored in 2 separate tables, one table keeps the data of current year and the other keeps the rest. The value of current year is determined by `CURRENT_YEAR_CONTEXT` setting in [config.py](config.py), or it will be calculated using the current time if not defined.
 
 #### SQL statement
 The following is a base query statement applied for all profiles except that some fields in the query such as `s.date`, `s.product_id`, and `s.region_id` can be replaced by their indexed versions to support performance tests with indexes of profile number 2 and 3. Besides, for the case of profile 3, if the queried data spans across two tables, two query statements will be created the `UNION ALL` operator is leveraged to combine them together.
@@ -136,7 +136,7 @@ JOIN regions r ON s.region_id = r.id
 WHERE product_name = '{product_name}' AND region_name = '{region_name}' AND date BETWEEN '{start_date}' AND '{end_date}';
 ```
 
-> **Notes:** The `WHERE` clause in the statement above is made in full conditions. In reality, it is adjusted to contain just enough conditions depending on what inputs it is given.
+> <u>**Notes**</u>: The `WHERE` clause in the statement above is made in full conditions. In reality, it is adjusted to contain just enough conditions depending on what inputs it is given.
 
 #### Test command
 ```bash
@@ -178,7 +178,7 @@ The optimization for this controller does not gain a significant improvement whe
 | Test #10           | 81.61ms   | 73.39ms   | 68.87ms    |
 | **% Avg. Improv.** | **N/A**   | **8.28%** | **14.16%** |
 
-> **Thoughts:** There is also another test, which is a denormalized case, where we can make the table directly hold `product_name` and `region_name` to remove the need of joining tables. This technique can gain some performance, however, it can create duplications and may sacrifice integrity.
+> <u>**Thoughts**</u>: There is also another test, which is a denormalized case, where we can make the table directly hold `product_name` and `region_name` to remove the need of joining tables. This technique can gain some performance, however, it can create duplications and may sacrifice integrity.
 
 ### TopProductsQuery
 This controller queries and returns top products based on sales revenue (aka. best-selling products). Number of products returned is depending on the request value of the parameter `limit` sent to the controller, or 5 if not specified.
@@ -236,5 +236,152 @@ The optimization of profile #2 by employing indexing only has improved the query
 | Test #10           | 129.76ms  | 112.35ms   |
 | **% Avg. Improv.** | **N/A**   | **16.81%** |
 
+### Application API
+To simulate a real production environment, there are three API endpoints created and respectively mapped to all the three controllers described earlier in this document.
 
+#### API authentication
+For accessing to an API endpoint, it is required to present a valid secret key which is the value that you have specified, when running this application as a docker container, in the use of `--env API_SECRET_KEY=123abcxyz`.
 
+To authenticate a request, you will insert a header with the secret key as value into the request, as following: `X-Api-Key: <your_secret_key>`.
+
+#### Query parameters
+The API accepts query parameters that are encoded as a query string leading by the question mark `?`, and appended to the request URL, e.g. `?param1=value1&param2=value2`.
+
+Although each endpoint can have its own parameters, these are two common and optional parameters that are shared across all the endpoints:
+
+| Param     | Type    | Default | Explain                                                                                                                                         |
+|-----------|---------|---------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| `profile` | `int`   | `None`  | Select to use a specific optimization profile of the controller. When profile is not specificed, the most optimized one is selected by default. |
+| `cache`   | `bool`  | `False` | Whether to use cache when querying.                                                                                                             |
+
+#### Endpoint: `GET` /sales/
+This endpoint is available for requesting via `GET` method and mapped to the [FilteredSalesQuery](#filteredsalesquery) controller.
+
+###### Query parameters
+Besides the default parameters, this endpoint accepts these additional query parameters:
+
+| Param          | Type         | Default  | Explain                                                           |
+|----------------|--------------|----------|-------------------------------------------------------------------|
+| `product_name` | `str`        | `None`   | Filters sale records by product name.                             |
+| `region_name`  | `str`        | `None`   | Filters sale records by region name.                              |
+| `start_date`   | `yyyy-mm-dd` | `None`   | Returns sale records whose dates are not sooner than _start_date_ |
+| `end_date`     | `yyyy-mm-dd` | `None`   | Returns sale records whose dates are not after _end_date_         |
+
+###### Curl command
+This is a sample request made by `cURL`:
+
+```bash
+$> curl --header "X-Api-Key: 123abcxyz" \
+        "http://localhost:5000/sales/?start_date=2025-01-01&product_name=Sample+Product&cache=1"
+```
+
+Response data:
+
+```json
+[
+  {
+    "sale_date": "2025-01-01",
+    "product_name": "Sample Product",
+    "region_name": "Sample Region",
+    "revenue": 1000.00
+  },
+  ...
+]
+```
+
+#### Endpoint: `GET` /sales/monthly-revenue/
+An endpoint that is mapped to [MonthlySalesQuery](#monthlysalesquery) controller. It accepts requesting via `GET` method and doesn't have any additional query parameters specifically designed except the default ones.
+
+###### Curl command
+```bash
+$> curl --header "X-Api-Key: 123abcxyz" \
+        "http://localhost:5000/sales/monthly-revenue/?cache=1"
+```
+
+Response data:
+```json
+[
+  {
+    "year": "2025",
+    "month": "01",
+    "revenue": 100000.00
+  },
+  ...
+]
+```
+
+#### Endpoint: `GET` /sales/top-products/
+Like the other endpoints, this one is also available for accepting `GET` requests only, and is mapped to [TopProductsQuery](#topproductsquery) controller.
+
+###### Query parameters
+Here is the only parameter this endpoint additionally accepts:
+
+| Param   | Type  | Default | Explain                            |
+|---------|-------|---------|------------------------------------|
+| `limit` | `int` | `5`     | How many products you want to get? |
+
+###### Curl command
+```bash
+$> curl --header "X-Api-Key: 123abcxyz" \
+        "http://localhost:5000/sales/top-products/?limit=3&cache=1"
+```
+
+Response data:
+```json
+[
+  {
+    "product_name": "Sample Product",
+    "total_revenue": 200000.00
+  },
+  ...
+]
+```
+
+#### Test caching feature
+The API is built with caching support that aims to gain an additional improvement of at least 30%. However, the feature is not enabled by default and requires an explicit request by including parameter `cache=1` to every request sent.
+
+Though we can experiment caching by making a curl command, it's not easy to observe the improvement or see the difference between before and after caching. This section describes the test case we can use to achieve this purpose.
+
+Command to run the test case:
+
+```bash
+$> docker exec -it aggregation-api python -m unittest tests.test_api_caching -v
+```
+
+Here is the sample output of the test, the time values labeled as `first:` and `second:` represent the tests that happen before and after caching respectively:
+
+```text
+test_filter_sales (tests.test_api_caching.ApiCaching.test_filter_sales) ... first: 3.03ms | second: 0.59ms
+ok
+test_monthly_sales (tests.test_api_caching.ApiCaching.test_monthly_sales) ... first: 0.80ms | second: 0.37ms
+ok
+test_top_products (tests.test_api_caching.ApiCaching.test_top_products) ... first: 0.87ms | second: 0.35ms
+ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.009s
+
+OK
+```
+
+> <u>**Notes**</u>: In contrast to controller tests, the elapsed time in API tests is calculated by counting one request only (instead of accumulating over 200 executions). This explains why the numbers here are much lower than what of the controller tests. 
+
+#### Test functionalities
+The functionality of each endpoint can be tested to verify whether it is working properly or not. There is also a test case created for doing that, which can be run by command:
+
+```bash
+$> docker exec -it aggregation-api python -m unittest tests.test_api_function -v
+```
+
+Likewise, its sample output of test results looks as following:
+
+```text
+test_filter_sales (tests.test_api_function.ApiFunctionality.test_filter_sales) ... ok
+test_monthly_sales (tests.test_api_function.ApiFunctionality.test_monthly_sales) ... ok
+test_top_products (tests.test_api_function.ApiFunctionality.test_top_products) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.009s
+
+OK
+```
