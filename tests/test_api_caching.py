@@ -6,7 +6,7 @@ class ApiCaching(ApiTest):
 
     def test_filter_sales(self):
         params = {'start_date': '2025-01-01', 'end_date': '2025-01-31'}
-        self.describe_cache_time('/sales/', params=params)
+        self.describe_cache_time('/sales/', params=params, expect_threshold=50)
 
     def test_monthly_sales(self):
         self.describe_cache_time('/sales/monthly-revenue/')

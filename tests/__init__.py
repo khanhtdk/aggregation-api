@@ -61,7 +61,7 @@ class ApiTest(BaseTest):
         elapsed = timeit.timeit(request, number=1) * 1000
         return elapsed
 
-    def describe_cache_time(self, endpoint, params=None, headers=None):
+    def describe_cache_time(self, endpoint, params=None, headers=None, expect_threshold=None):
         """
         Tests cache efficiency and shows elapsed time for both before and after
         caching requests.
@@ -73,5 +73,8 @@ class ApiTest(BaseTest):
         e1, e2 = [self.time_get(endpoint, headers=headers, params=params) for _ in range(2)]
         # Ensures second request takes less time than the first one
         self.assertLess(e2, e1)
+        # Ensures the improvement meets the expected threshold
+        if expect_threshold is not None:
+            self.assertGreaterEqual((e1 - e2) / e1 * 100, expect_threshold)
         # Prints output
-        print('before:', f'{e1:.2f}ms', '|', 'after:', f'{e2:.2f}ms')
+        print('first:', f'{e1:.2f}ms', '|', 'second:', f'{e2:.2f}ms')
