@@ -257,7 +257,7 @@ Although each endpoint can have its own parameters, these are two common and opt
 #### Endpoint: `GET` /sales/
 This endpoint is available for requesting via `GET` method and mapped to the [FilteredSalesQuery](#filteredsalesquery) controller.
 
-###### Query parameters
+##### Query parameters
 Besides the default parameters, this endpoint accepts these additional query parameters:
 
 | Param          | Type         | Default  | Explain                                                           |
@@ -267,7 +267,7 @@ Besides the default parameters, this endpoint accepts these additional query par
 | `start_date`   | `yyyy-mm-dd` | `None`   | Returns sale records whose dates are not sooner than _start_date_ |
 | `end_date`     | `yyyy-mm-dd` | `None`   | Returns sale records whose dates are not after _end_date_         |
 
-###### Curl command
+##### Curl command
 This is a sample request made by `cURL`:
 
 ```bash
@@ -292,7 +292,7 @@ Response data:
 #### Endpoint: `GET` /sales/monthly-revenue/
 An endpoint that is mapped to [MonthlySalesQuery](#monthlysalesquery) controller. It accepts requesting via `GET` method and doesn't have any additional query parameters specifically designed except the default ones.
 
-###### Curl command
+##### Curl command
 ```bash
 $> curl --header "X-Api-Key: 123abcxyz" \
         "http://localhost:5000/sales/monthly-revenue/?cache=1"
@@ -313,14 +313,14 @@ Response data:
 #### Endpoint: `GET` /sales/top-products/
 Like the other endpoints, this one is also available for accepting `GET` requests only, and is mapped to [TopProductsQuery](#topproductsquery) controller.
 
-###### Query parameters
+##### Query parameters
 Here is the only parameter this endpoint additionally accepts:
 
 | Param   | Type  | Default | Explain                            |
 |---------|-------|---------|------------------------------------|
 | `limit` | `int` | `5`     | How many products you want to get? |
 
-###### Curl command
+##### Curl command
 ```bash
 $> curl --header "X-Api-Key: 123abcxyz" \
         "http://localhost:5000/sales/top-products/?limit=3&cache=1"
