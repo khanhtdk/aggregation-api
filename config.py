@@ -20,4 +20,4 @@ CACHE_DEFAULT_TIMEOUT = 60  # seconds
 
 # Set a secret key for accessing to self API. This value should be replaced when
 # being used in production.
-API_SECRET_KEY = '0123456789abcdefghijklmnopqrstuvwxyz'
+API_SECRET_KEY = os.getenv('API_SECRET_KEY', default='0123456789abcdefghijklmnopqrstuvwxyz')
